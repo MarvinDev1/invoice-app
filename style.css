@@ -598,6 +598,158 @@ body {
     overflow-y: auto;
 }
 
+@media (max-width: 768px) {
+    html, body {
+        overflow-x: hidden;
+    }
+
+    body {
+        min-height: 100vh;
+    }
+
+    .auth-wrapper {
+        position: relative;
+        height: auto;
+        min-height: 100vh;
+        padding: 1rem;
+    }
+
+    .auth-card {
+        padding: 1.5rem 1rem;
+        max-width: 100%;
+    }
+
+    .logo-area h2 {
+        font-size: 1.05rem;
+    }
+
+    .auth-form h3 {
+        font-size: 1rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .btn,
+    .template-tab,
+    .full-width {
+        width: 100%;
+    }
+
+    .app-main-layout {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.8rem 1rem;
+    }
+
+    .app-header .actions {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .app-header .actions .btn {
+        flex: 1 1 45%;
+        min-width: 0;
+    }
+
+    .workspace {
+        flex-direction: column;
+        overflow: visible;
+    }
+
+    .editor-panel {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem;
+    }
+
+    .preview-panel {
+        padding: 1rem;
+        overflow: visible;
+    }
+
+    .preview-badge {
+        position: static;
+        margin-bottom: 0.75rem;
+        align-self: flex-start;
+    }
+
+    .invoice-paper {
+        max-width: 100%;
+        padding: 1.25rem;
+        margin-top: 0;
+    }
+
+    .template-picker {
+        flex-wrap: wrap;
+    }
+
+    .template-tab {
+        flex-basis: 100%;
+    }
+
+    .inv-header,
+    .inv-parties,
+    .inv-footer-section {
+        flex-direction: column;
+        gap: 0.9rem;
+    }
+
+    .inv-meta,
+    .dates {
+        text-align: left;
+    }
+
+    .inv-table,
+    .inv-table thead,
+    .inv-table tbody,
+    .inv-table tr,
+    .inv-table th,
+    .inv-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .inv-table thead {
+        display: none;
+    }
+
+    .inv-table tr {
+        margin-bottom: 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 0.5rem 0.75rem;
+        background: #f8fafc;
+    }
+
+    .inv-table td {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.4rem 0;
+        border: none;
+    }
+
+    .inv-table td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #475569;
+    }
+
+    .inv-totals {
+        width: 100%;
+    }
+}
+
 @media print {
     @page {
         size: A4 portrait;
