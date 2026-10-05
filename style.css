@@ -1,0 +1,728 @@
+:root {
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --border-color: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+    --danger-color: #ef4444;
+    --danger-hover: #dc2626;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Authentication Wrapper */
+.auth-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.auth-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 2.5rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    color: var(--accent-color);
+}
+
+.logo-area.center {
+    justify-content: center;
+}
+
+.logo-area h2 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+}
+
+.auth-form h3 {
+    margin-bottom: 1.25rem;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.4rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    background: #0f172a;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0.65rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+}
+
+.btn-primary {
+    background: var(--accent-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+}
+
+.btn-secondary {
+    background: var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background: #475569;
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: var(--danger-hover);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px dashed var(--border-color);
+    color: var(--text-secondary);
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.btn-outline:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.full-width {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.auth-switch a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+.password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-field input {
+    width: 100%;
+    padding-right: 2.75rem;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 0.25rem;
+}
+
+.password-toggle:focus {
+    outline: none;
+}
+
+.auth-error {
+    color: #ef4444;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-top: 0.75rem;
+    text-align: center;
+    display: block;
+}
+
+.auth-success {
+    color: #10b981;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-top: 0.75rem;
+    text-align: center;
+    display: block;
+}
+
+/* App Main Layout */
+.app-main-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.app-header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.app-header .logo-area h1 {
+    font-size: 1.15rem;
+    color: var(--text-primary);
+}
+
+.app-header .actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.workspace {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.editor-panel {
+    width: 450px;
+    background: var(--card-bg);
+    border-right: 1px solid var(--border-color);
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.editor-panel h2 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.editor-panel h3 {
+    font-size: 0.95rem;
+    margin: 1rem 0 0.75rem 0;
+    color: var(--text-secondary);
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 1.25rem 0;
+}
+
+/* Line Items Editor Row */
+.item-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+}
+
+.item-row input {
+    background: #0f172a;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.5rem;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+
+.item-row .delete-btn {
+    background: transparent;
+    border: none;
+    color: var(--danger-color);
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.item-row .delete-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+/* Preview Panel */
+.preview-panel {
+    flex: 1;
+    background: #090d16;
+    padding: 2rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.preview-badge {
+    position: absolute;
+    top: 1rem;
+    right: 2rem;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--card-bg);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.preview-badge .dot {
+    width: 6px;
+    height: 6px;
+    background: var(--success-color);
+    border-radius: 50%;
+}
+
+/* Invoice Paper Layout */
+.invoice-paper {
+    background: white;
+    color: #1e293b;
+    width: 100%;
+    max-width: 700px;
+    padding: 2.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    margin-top: 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.invoice-paper.template-modern {
+    background: #ffffff;
+    color: #0f172a;
+}
+
+.invoice-paper.template-classic {
+    background: #f8f5ef;
+    color: #1f2937;
+    border: 1px solid #d9cdb0;
+}
+
+.invoice-paper.template-classic .inv-table th {
+    background: #efe7d2;
+    color: #4b5563;
+}
+
+.invoice-paper.template-creative {
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+    color: #111827;
+    border: 1px solid #c7d2fe;
+}
+
+.invoice-paper.template-creative .status-badge {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.invoice-paper.is-payment-receipt {
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%);
+    border: 1px solid #86efac;
+}
+
+.invoice-paper.is-payment-receipt .status-badge {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.payment-receipt-note {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.72rem;
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
+    color: #166534;
+    font-weight: 700;
+}
+
+.template-picker {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.35rem;
+}
+
+.template-tab {
+    flex: 1;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: #0f172a;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.template-tab.active {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.invoice-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.logo-wrap img {
+    max-height: 50px;
+    max-width: 150px;
+    object-fit: contain;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.status-draft { background: #e2e8f0; color: #475569; }
+.status-sent { background: #dbeafe; color: #1d4ed8; }
+.status-paid { background: #d1fae5; color: #065f46; }
+.status-overdue { background: #fee2e2; color: #991b1b; }
+
+.inv-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.sender-info h3 { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
+.sender-info p { font-size: 0.85rem; color: #64748b; }
+
+.inv-meta { text-align: right; }
+.inv-meta h2 { font-size: 1.5rem; font-weight: 800; color: #0f172a; letter-spacing: 1px; }
+.invoice-num { font-size: 0.9rem; color: #64748b; }
+
+.inv-parties {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    font-size: 0.85rem;
+}
+
+.billed-to .label {
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.billed-to h4 { font-size: 1rem; font-weight: 600; color: #0f172a; }
+.billed-to p { color: #475569; }
+.dates { text-align: right; color: #475569; }
+
+.inv-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+}
+
+.inv-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px;
+    text-align: left;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.inv-table th:last-child { text-align: right; }
+
+.inv-table td {
+    padding: 12px 10px;
+    font-size: 0.85rem;
+    color: #1e293b;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.inv-footer-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.stamp-wrap img {
+    max-height: 80px;
+    max-width: 120px;
+    object-fit: contain;
+}
+
+.inv-totals {
+    width: 250px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.total-row.final {
+    border-top: 2px solid #0f172a;
+    margin-top: 6px;
+    padding-top: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #0f172a;
+}
+
+/* History Overlay */
+.history-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: flex-end;
+    z-index: 1100;
+}
+
+.history-drawer {
+    background: var(--card-bg);
+    width: 400px;
+    height: 100%;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.history-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 12mm;
+    }
+
+    html, body {
+        background: #ffffff !important;
+        color: #111827 !important;
+        min-height: auto !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    #auth-container,
+    .auth-wrapper,
+    .app-header,
+    .actions,
+    .btn,
+    .editor-panel,
+    .workspace,
+    .preview-badge,
+    .template-picker,
+    .template-tab,
+    .history-overlay,
+    .history-drawer,
+    .item-row,
+    .delete-btn,
+    .divider,
+    .form-group,
+    .form-row,
+    .form-control,
+    input,
+    textarea,
+    select,
+    button,
+    .auth-form,
+    .auth-card,
+    .logo-area,
+    .view-section {
+        display: none !important;
+    }
+
+    #app-workspace,
+    .app-main-layout,
+    .preview-panel,
+    #invoice-preview,
+    .invoice-paper,
+    .invoice-card {
+        visibility: visible !important;
+        display: block !important;
+    }
+
+    #app-workspace,
+    .app-main-layout {
+        position: static !important;
+        width: 100% !important;
+        max-width: none !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+        display: block !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    .workspace {
+        display: block !important;
+        width: 100% !important;
+        overflow: visible !important;
+    }
+
+    .preview-panel {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+        overflow: visible !important;
+        display: block !important;
+        flex: none !important;
+    }
+
+    #invoice-preview,
+    .invoice-paper,
+    .invoice-card {
+        width: 100% !important;
+        max-width: none !important;
+        min-height: 100% !important;
+        margin: 0 !important;
+        padding: 1.2cm !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        color: #111827 !important;
+        display: block !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .invoice-paper *,
+    .invoice-card * {
+        visibility: visible !important;
+    }
+
+    .status-badge,
+    .payment-receipt-note,
+    .inv-meta,
+    .sender-info,
+    .billed-to,
+    .dates,
+    .inv-footer-section,
+    .inv-totals {
+        color: inherit !important;
+        background: transparent !important;
+    }
+
+    .inv-header,
+    .inv-parties,
+    .inv-footer-section {
+        break-inside: avoid !important;
+    }
+}
