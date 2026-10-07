@@ -20,6 +20,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const forgotSuccess = document.getElementById('forgot-success');
 
     const logoutBtn = document.getElementById('logout-btn');
+    const editorPanel = document.getElementById('editor-panel');
+    const editorBackdrop = document.getElementById('editor-backdrop');
+    const mobileEditorClose = document.getElementById('mobile-editor-close');
+    const mobileEditorToggle = document.getElementById('mobile-editor-toggle');
+
+    function toggleMobileEditor(forceState) {
+        if (!editorPanel) return;
+
+        const shouldOpen = typeof forceState === 'boolean' ? forceState : !editorPanel.classList.contains('mobile-open');
+        editorPanel.classList.toggle('mobile-open', shouldOpen);
+        editorPanel.classList.toggle('is-open', shouldOpen);
+        editorBackdrop?.classList.toggle('is-open', shouldOpen);
+        document.body.classList.toggle('editor-panel-open', shouldOpen);
+
+        if (mobileEditorToggle) {
+            mobileEditorToggle.setAttribute('aria-expanded', String(shouldOpen));
+        }
+    }
+
+    if (mobileEditorToggle) {
+        mobileEditorToggle.addEventListener('click', () => toggleMobileEditor());
+    }
+
+    if (mobileEditorClose) {
+        mobileEditorClose.addEventListener('click', () => toggleMobileEditor(false));
+    }
+
+    if (editorBackdrop) {
+        editorBackdrop.addEventListener('click', () => toggleMobileEditor(false));
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && editorPanel && editorPanel.classList.contains('mobile-open')) {
+            toggleMobileEditor(false);
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            editorPanel?.classList.remove('mobile-open', 'is-open');
+            editorBackdrop?.classList.remove('is-open');
+            document.body.classList.remove('editor-panel-open');
+            if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'false');
+        }
+    });
 
     // On page load, ensure auth container is shown and workspace hidden
     if (authContainer) authContainer.style.display = 'flex';
@@ -104,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Login Form Submission (Connected to login.php)
+    // Login Form Submission (Delegates validation & error handling completely to login.php)
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -129,9 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (appWorkspace) appWorkspace.style.display = 'flex';
                 } else {
                     loginError.className = 'auth-error';
-                    loginError.textContent = data.message === 'Invalid email or password.'
-                        ? 'You must have an account to login.'
-                        : data.message;
+                    loginError.textContent = data.message;
                     loginError.style.display = 'block';
                 }
             } catch (err) {
@@ -148,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         element.style.display = 'block';
     }
 
-    // Register Form Submission
+    // Register Form Submission (Delegates validation & error handling completely to register.php)
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -160,22 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
             registerError.textContent = '';
             registerError.className = 'auth-error';
 
-            const namePattern = /^[A-Za-z\s'-]+$/;
-            if (!name || !namePattern.test(name)) {
-                registerError.textContent = 'Name can only contain letters and spaces.';
-                registerError.style.display = 'block';
-                return;
-            }
-
-            const passwordRule = 'Password must be at least 8 characters and include an uppercase letter, a number, and a special character.';
-            const strongPasswordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-
-            if (!strongPasswordPattern.test(password)) {
-                registerError.textContent = passwordRule;
-                registerError.style.display = 'block';
-                return;
-            }
-
             try {
                 const response = await fetch('register.php', {
                     method: 'POST',
@@ -183,16 +210,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ name, email, password })
                 });
                 const data = await response.json();
+                
                 if (data.status === 'success') {
                     switchAuthView('login');
-                    showAuthMessage(loginError, 'Registration successful. Please sign in.', false);
+                    showAuthMessage(loginError, data.message, false);
                 } else {
                     registerError.className = 'auth-error';
                     registerError.textContent = data.message;
                     registerError.style.display = 'block';
                 }
             } catch (err) {
-                registerError.textContent = 'Registration service endpoint not found yet.';
+                registerError.textContent = 'Unable to connect to the registration server.';
                 registerError.style.display = 'block';
             }
         });
@@ -320,9 +348,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const addItemBtn = document.getElementById('add-item-btn');
     const saveInvoiceBtn = document.getElementById('save-btn');
     const viewHistoryBtn = document.getElementById('view-history-btn');
+    const printBtn = document.getElementById('print-btn');
     const historyOverlay = document.getElementById('history-overlay');
     const historyClose = document.getElementById('history-close');
-    const printBtn = document.getElementById('print-btn');
 
     function initFormValues() {
         if (busNameInput) busNameInput.value = invoiceData.business.name;

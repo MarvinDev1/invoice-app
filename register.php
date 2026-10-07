@@ -17,6 +17,16 @@ if (!preg_match('/^[A-Za-z\s\'-]+$/u', $name)) {
     exit;
 }
 
+// Server-side password validation using your exact regex pattern
+$password_pattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
+if (!preg_match($password_pattern, $password)) {
+    echo json_encode([
+        "status" => "error", 
+        "message" => "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, a number, and a special character."
+    ]);
+    exit;
+}
+
 try {
     // Check if email already exists
     $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");

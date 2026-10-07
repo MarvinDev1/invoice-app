@@ -6,8 +6,14 @@ $data = json_decode(file_get_contents('php://input'), true);
 $email = filter_var($data['email'] ?? '', FILTER_SANITIZE_EMAIL);
 $password = $data['password'] ?? '';
 
-if (!filter_var($email, FILTER_VALIDATE_EMAIL) || empty($password)) {
-    echo json_encode(["status" => "error", "message" => "Please enter a valid email and password."]);
+// Server-side validation for login inputs
+if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo json_encode(["status" => "error", "message" => "Please enter a valid email address."]);
+    exit;
+}
+
+if (empty($password)) {
+    echo json_encode(["status" => "error", "message" => "Please enter your password."]);
     exit;
 }
 
@@ -23,7 +29,6 @@ try {
 
     // Verify password using Sodium Argon2id
     if (sodium_crypto_pwhash_str_verify($user['password_hash'], $password)) {
-        // Start session or return success
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
