@@ -89,6 +89,10 @@
                 <h1>Swift Invoice Studio</h1>
             </div>
             <div class="actions">
+                <button type="button" id="mobile-editor-toggle" class="mobile-editor-toggle" aria-controls="editor-panel" aria-expanded="false" aria-label="Toggle invoice editor">
+                    <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+                    <span class="toggle-label">Edit Invoice</span>
+                </button>
                 <button id="save-btn" class="btn btn-secondary">Save Invoice</button>
                 <button id="view-history-btn" class="btn btn-secondary">Invoices</button>
                 <button id="print-btn" class="btn btn-primary">Download PDF</button>
@@ -97,7 +101,7 @@
         </header>
 
         <main class="workspace">
-            <section class="editor-panel">
+            <section class="editor-panel" id="editor-panel">
                 <h2>Invoice Editor</h2>
                 <div class="form-row">
                     <div class="form-group">

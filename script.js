@@ -20,6 +20,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const forgotSuccess = document.getElementById('forgot-success');
 
     const logoutBtn = document.getElementById('logout-btn');
+    const editorPanel = document.getElementById('editor-panel');
+    const mobileEditorToggle = document.getElementById('mobile-editor-toggle');
+
+    function toggleMobileEditor(forceState) {
+        if (!editorPanel || !mobileEditorToggle || window.innerWidth > 768) {
+            if (editorPanel) editorPanel.classList.remove('is-open');
+            if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'false');
+            document.body.classList.remove('editor-panel-open');
+            return;
+        }
+
+        const shouldOpen = typeof forceState === 'boolean' ? forceState : !editorPanel.classList.contains('is-open');
+        editorPanel.classList.toggle('is-open', shouldOpen);
+        mobileEditorToggle.setAttribute('aria-expanded', String(shouldOpen));
+        document.body.classList.toggle('editor-panel-open', shouldOpen);
+    }
+
+    if (mobileEditorToggle) {
+        mobileEditorToggle.addEventListener('click', () => {
+            toggleMobileEditor();
+        });
+    }
+
+    window.addEventListener('resize', () => {
+        toggleMobileEditor(window.innerWidth > 768 ? false : editorPanel && editorPanel.classList.contains('is-open'));
+    });
 
     // On page load, ensure auth container is shown and workspace hidden
     if (authContainer) authContainer.style.display = 'flex';
