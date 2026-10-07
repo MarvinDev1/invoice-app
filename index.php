@@ -105,7 +105,10 @@
             <section class="editor-panel" id="editor-panel">
                 <div class="editor-panel-header">
                     <h2>Invoice Editor</h2>
-                    <button type="button" class="mobile-editor-close" id="mobile-editor-close" aria-label="Close editor">×</button>
+                    <button type="button" class="mobile-editor-close" id="mobile-editor-close" aria-label="Close editor">
+                        <span aria-hidden="true">×</span>
+                        <span class="close-label">Close</span>
+                    </button>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
