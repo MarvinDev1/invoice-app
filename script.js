@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         element.style.display = 'block';
     }
 
-    // Register Form Submission (Stub for backend integration)
+    // Register Form Submission
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -483,11 +483,13 @@ document.addEventListener('DOMContentLoaded', () => {
             invoiceData.invoice.items.forEach(item => {
                 const tr = document.createElement('tr');
                 const lineTotal = (parseFloat(item.qty) || 0) * (parseFloat(item.price) || 0);
+                
+                // Added data-label attributes for mobile stacked card responsiveness
                 tr.innerHTML = `
-                    <td>${item.description}</td>
-                    <td>${item.qty}</td>
-                    <td>UGX${parseFloat(item.price || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-                    <td style="text-align: right;">UGX${lineTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                    <td data-label="Description">${item.description}</td>
+                    <td data-label="Qty">${item.qty}</td>
+                    <td data-label="Rate">UGX${parseFloat(item.price || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                    <td data-label="Total" style="text-align: right;">UGX${lineTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                 `;
                 prevItemsList.appendChild(tr);
             });
