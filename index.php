@@ -101,8 +101,12 @@
         </header>
 
         <main class="workspace">
-            <section class="editor-panel">
-                <h2>Invoice Editor</h2>
+            <div class="editor-backdrop" id="editor-backdrop" aria-hidden="true"></div>
+            <section class="editor-panel" id="editor-panel">
+                <div class="editor-panel-header">
+                    <h2>Invoice Editor</h2>
+                    <button type="button" class="mobile-editor-close" id="mobile-editor-close" aria-label="Close editor">×</button>
+                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Invoice Template</label>

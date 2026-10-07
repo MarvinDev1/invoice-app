@@ -21,13 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const logoutBtn = document.getElementById('logout-btn');
     const editorPanel = document.getElementById('editor-panel');
+    const editorBackdrop = document.getElementById('editor-backdrop');
     const mobileEditorToggle = document.getElementById('mobile-editor-toggle');
+    const mobileEditorClose = document.getElementById('mobile-editor-close');
 
     function toggleMobileEditor(forceState) {
         if (!editorPanel) return;
 
         if (window.innerWidth > 768) {
             editorPanel.classList.remove('is-open');
+            editorBackdrop?.classList.remove('is-open');
             document.body.classList.remove('editor-panel-open');
             if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'false');
             return;
@@ -35,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const shouldOpen = typeof forceState === 'boolean' ? forceState : !editorPanel.classList.contains('is-open');
         editorPanel.classList.toggle('is-open', shouldOpen);
+        editorBackdrop?.classList.toggle('is-open', shouldOpen);
         document.body.classList.toggle('editor-panel-open', shouldOpen);
 
         if (mobileEditorToggle) {
@@ -46,11 +50,26 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileEditorToggle.addEventListener('click', () => toggleMobileEditor());
     }
 
+    if (mobileEditorClose) {
+        mobileEditorClose.addEventListener('click', () => toggleMobileEditor(false));
+    }
+
+    if (editorBackdrop) {
+        editorBackdrop.addEventListener('click', () => toggleMobileEditor(false));
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && window.innerWidth <= 768 && editorPanel && editorPanel.classList.contains('is-open')) {
+            toggleMobileEditor(false);
+        }
+    });
+
     window.addEventListener('resize', () => {
         if (window.innerWidth > 768) {
             toggleMobileEditor(false);
         } else {
             editorPanel?.classList.remove('is-open');
+            editorBackdrop?.classList.remove('is-open');
             document.body.classList.remove('editor-panel-open');
             if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'false');
         }

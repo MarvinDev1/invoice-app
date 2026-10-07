@@ -280,9 +280,21 @@ body {
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
+.editor-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
 .editor-panel h2 {
     font-size: 1.1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+}
+
+.mobile-editor-close {
+    display: none;
 }
 
 .editor-panel h3 {
@@ -650,51 +662,60 @@ body {
 
     .app-header {
         display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.7rem;
-        padding: 0.8rem 1rem;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.65rem;
+        padding: 0.75rem 0.9rem;
+        flex-wrap: wrap;
     }
 
     .app-header .logo-area {
-        width: 100%;
+        width: auto;
         justify-content: flex-start;
+        min-width: 0;
+        flex: 1 1 auto;
     }
 
     .app-header .actions {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.45rem;
         width: 100%;
+        flex-wrap: wrap;
     }
 
     .app-header .actions .btn {
         display: inline-flex;
-        width: 100%;
-        padding: 0.7rem 0.35rem;
+        flex: 1 1 calc(50% - 0.45rem);
+        min-width: 110px;
+        justify-content: center;
+        padding: 0.65rem 0.75rem;
         font-size: 0.72rem;
         line-height: 1.2;
-        text-align: center;
-        white-space: normal;
-    }
-
-    #logout-btn {
-        display: none;
+        white-space: nowrap;
     }
 
     .mobile-editor-toggle {
+        position: fixed;
+        top: 0.7rem;
+        right: 0.75rem;
+        z-index: 55;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 0.45rem;
-        width: 100%;
-        min-height: 44px;
+        min-height: 42px;
+        padding: 0.65rem 0.8rem;
         border: 1px solid var(--border-color);
-        background: rgba(15, 23, 42, 0.9);
+        background: rgba(15, 23, 42, 0.96);
         color: var(--text-primary);
         border-radius: 10px;
         cursor: pointer;
         font-weight: 600;
+        white-space: nowrap;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
     }
 
     .hamburger-icon {
@@ -720,6 +741,22 @@ body {
         position: relative;
         display: block;
         overflow: visible;
+        min-height: calc(100vh - 78px);
+    }
+
+    .editor-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.45);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+        z-index: 35;
+    }
+
+    .editor-backdrop.is-open {
+        opacity: 1;
+        pointer-events: auto;
     }
 
     .editor-panel {
@@ -729,11 +766,12 @@ body {
         z-index: 40;
         width: min(84vw, 420px);
         height: 100vh;
-        padding: 5.1rem 1rem 1rem;
+        padding: 1rem 1rem 1.2rem;
         border-right: 1px solid var(--border-color);
         transform: translateX(-110%);
         opacity: 0;
         pointer-events: none;
+        display: block;
         box-shadow: 12px 0 24px rgba(2, 6, 23, 0.55);
     }
 
@@ -743,13 +781,32 @@ body {
         pointer-events: auto;
     }
 
-    body.editor-panel-open::after {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.35);
-        z-index: 30;
-        pointer-events: none;
+    .editor-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        padding-top: 0.5rem;
+    }
+
+    .mobile-editor-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 1px solid var(--border-color);
+        background: rgba(15, 23, 42, 0.8);
+        color: var(--text-primary);
+        font-size: 1.25rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    body.editor-panel-open {
+        overflow: hidden;
     }
 
     .preview-panel {
