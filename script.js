@@ -24,27 +24,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileEditorToggle = document.getElementById('mobile-editor-toggle');
 
     function toggleMobileEditor(forceState) {
-        if (!editorPanel || !mobileEditorToggle || window.innerWidth > 768) {
-            if (editorPanel) editorPanel.classList.remove('is-open');
-            if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'false');
+        if (!editorPanel) return;
+
+        if (window.innerWidth > 768) {
+            editorPanel.classList.remove('is-open');
             document.body.classList.remove('editor-panel-open');
+            if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'false');
             return;
         }
 
         const shouldOpen = typeof forceState === 'boolean' ? forceState : !editorPanel.classList.contains('is-open');
         editorPanel.classList.toggle('is-open', shouldOpen);
-        mobileEditorToggle.setAttribute('aria-expanded', String(shouldOpen));
         document.body.classList.toggle('editor-panel-open', shouldOpen);
+
+        if (mobileEditorToggle) {
+            mobileEditorToggle.setAttribute('aria-expanded', String(shouldOpen));
+        }
     }
 
     if (mobileEditorToggle) {
-        mobileEditorToggle.addEventListener('click', () => {
-            toggleMobileEditor();
-        });
+        mobileEditorToggle.addEventListener('click', () => toggleMobileEditor());
     }
 
     window.addEventListener('resize', () => {
-        toggleMobileEditor(window.innerWidth > 768 ? false : editorPanel && editorPanel.classList.contains('is-open'));
+        if (window.innerWidth > 768) {
+            toggleMobileEditor(false);
+        } else {
+            editorPanel?.classList.remove('is-open');
+            document.body.classList.remove('editor-panel-open');
+            if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'false');
+        }
     });
 
     // On page load, ensure auth container is shown and workspace hidden
