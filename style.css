@@ -773,12 +773,14 @@ body {
         transform: translate(-50%, 110%);
         opacity: 0;
         pointer-events: none;
-        display: block;
+        display: none !important;
         box-shadow: 0 -14px 30px rgba(2, 6, 23, 0.5);
         overflow-y: auto;
     }
 
+    .editor-panel.mobile-open,
     .editor-panel.is-open {
+        display: block !important;
         transform: translate(-50%, 0);
         opacity: 1;
         pointer-events: auto;

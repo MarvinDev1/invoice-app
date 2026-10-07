@@ -29,14 +29,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!editorPanel) return;
 
         if (window.innerWidth > 768) {
-            editorPanel.classList.remove('is-open');
+            editorPanel.classList.remove('mobile-open', 'is-open');
             editorBackdrop?.classList.remove('is-open');
             document.body.classList.remove('editor-panel-open');
             if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'false');
             return;
         }
 
-        const shouldOpen = typeof forceState === 'boolean' ? forceState : !editorPanel.classList.contains('is-open');
+        const shouldOpen = typeof forceState === 'boolean' ? forceState : !editorPanel.classList.contains('mobile-open');
+        editorPanel.classList.toggle('mobile-open', shouldOpen);
         editorPanel.classList.toggle('is-open', shouldOpen);
         editorBackdrop?.classList.toggle('is-open', shouldOpen);
         document.body.classList.toggle('editor-panel-open', shouldOpen);
@@ -59,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && window.innerWidth <= 768 && editorPanel && editorPanel.classList.contains('is-open')) {
+        if (event.key === 'Escape' && window.innerWidth <= 768 && editorPanel && editorPanel.classList.contains('mobile-open')) {
             toggleMobileEditor(false);
         }
     });
@@ -68,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.innerWidth > 768) {
             toggleMobileEditor(false);
         } else {
-            editorPanel?.classList.remove('is-open');
+            editorPanel?.classList.remove('mobile-open', 'is-open');
             editorBackdrop?.classList.remove('is-open');
             document.body.classList.remove('editor-panel-open');
             if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'false');
