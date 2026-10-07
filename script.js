@@ -20,61 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const forgotSuccess = document.getElementById('forgot-success');
 
     const logoutBtn = document.getElementById('logout-btn');
-    const editorPanel = document.getElementById('editor-panel');
-    const editorBackdrop = document.getElementById('editor-backdrop');
-    const mobileEditorToggle = document.getElementById('mobile-editor-toggle');
-    const mobileEditorClose = document.getElementById('mobile-editor-close');
-
-    function toggleMobileEditor(forceState) {
-        if (!editorPanel) return;
-
-        if (window.innerWidth > 768) {
-            editorPanel.classList.remove('mobile-open', 'is-open');
-            editorBackdrop?.classList.remove('is-open');
-            document.body.classList.remove('editor-panel-open');
-            if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'false');
-            return;
-        }
-
-        const shouldOpen = typeof forceState === 'boolean' ? forceState : !editorPanel.classList.contains('mobile-open');
-        editorPanel.classList.toggle('mobile-open', shouldOpen);
-        editorPanel.classList.toggle('is-open', shouldOpen);
-        editorBackdrop?.classList.toggle('is-open', shouldOpen);
-        document.body.classList.toggle('editor-panel-open', shouldOpen);
-
-        if (mobileEditorToggle) {
-            mobileEditorToggle.setAttribute('aria-expanded', String(shouldOpen));
-        }
-    }
-
-    if (mobileEditorToggle) {
-        mobileEditorToggle.addEventListener('click', () => toggleMobileEditor());
-    }
-
-    if (mobileEditorClose) {
-        mobileEditorClose.addEventListener('click', () => toggleMobileEditor(false));
-    }
-
-    if (editorBackdrop) {
-        editorBackdrop.addEventListener('click', () => toggleMobileEditor(false));
-    }
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && window.innerWidth <= 768 && editorPanel && editorPanel.classList.contains('mobile-open')) {
-            toggleMobileEditor(false);
-        }
-    });
-
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            toggleMobileEditor(false);
-        } else {
-            editorPanel?.classList.remove('mobile-open', 'is-open');
-            editorBackdrop?.classList.remove('is-open');
-            document.body.classList.remove('editor-panel-open');
-            if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'false');
-        }
-    });
 
     // On page load, ensure auth container is shown and workspace hidden
     if (authContainer) authContainer.style.display = 'flex';
@@ -375,9 +320,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const addItemBtn = document.getElementById('add-item-btn');
     const saveInvoiceBtn = document.getElementById('save-btn');
     const viewHistoryBtn = document.getElementById('view-history-btn');
-    const printBtn = document.getElementById('print-btn');
     const historyOverlay = document.getElementById('history-overlay');
     const historyClose = document.getElementById('history-close');
+    const printBtn = document.getElementById('print-btn');
 
     function initFormValues() {
         if (busNameInput) busNameInput.value = invoiceData.business.name;
@@ -484,7 +429,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tr = document.createElement('tr');
                 const lineTotal = (parseFloat(item.qty) || 0) * (parseFloat(item.price) || 0);
                 
-                // Added data-label attributes for mobile stacked card responsiveness
                 tr.innerHTML = `
                     <td data-label="Description">${item.description}</td>
                     <td data-label="Qty">${item.qty}</td>

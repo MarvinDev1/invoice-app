@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swift Invoice Studio</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -85,14 +87,14 @@
     <div id="app-workspace" class="app-main-layout" style="display: none;">
         <header class="app-header">
             <div class="logo-area">
+                <!-- Bootstrap Hamburger Toggle Button for Mobile Offcanvas -->
+                <button class="btn btn-outline-secondary d-md-none me-2 p-1 px-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#editor-panel" aria-controls="editor-panel" aria-label="Toggle invoice editor">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                 <h1>Swift Invoice Studio</h1>
             </div>
             <div class="actions">
-                <button type="button" id="mobile-editor-toggle" class="mobile-editor-toggle" aria-label="Toggle invoice editor" aria-controls="editor-panel" aria-expanded="false">
-                    <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
-                    <span class="toggle-label">Edit</span>
-                </button>
                 <button id="save-btn" class="btn btn-secondary">Save Invoice</button>
                 <button id="view-history-btn" class="btn btn-secondary">Invoices</button>
                 <button id="print-btn" class="btn btn-primary">Download PDF</button>
@@ -101,105 +103,104 @@
         </header>
 
         <main class="workspace">
-            <div class="editor-backdrop" id="editor-backdrop" aria-hidden="true"></div>
-            <section class="editor-panel" id="editor-panel">
-                <div class="editor-panel-header">
-                    <h2>Invoice Editor</h2>
-                    <button type="button" class="mobile-editor-close" id="mobile-editor-close" aria-label="Close editor">
-                        <span aria-hidden="true">×</span>
-                        <span class="close-label">Close</span>
-                    </button>
+            <!-- Bootstrap offcanvas-md transforms the editor panel into a sliding drawer on mobile and static sidebar on desktop -->
+            <section class="offcanvas-md offcanvas-start editor-panel" tabindex="-1" id="editor-panel" aria-labelledby="editorPanelLabel">
+                <div class="offcanvas-header editor-panel-header border-bottom d-md-none">
+                    <h2 class="offcanvas-title fs-5" id="editorPanelLabel">Invoice Editor</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#editor-panel" aria-label="Close"></button>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Invoice Template</label>
-                        <div class="template-picker" aria-label="Invoice Template">
-                            <button type="button" class="template-tab active" data-template="template-modern">Modern</button>
-                            <button type="button" class="template-tab" data-template="template-classic">Classic</button>
-                            <button type="button" class="template-tab" data-template="template-creative">Creative</button>
+                <div class="offcanvas-body editor-content d-flex flex-column p-3 p-md-0">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Invoice Template</label>
+                            <div class="template-picker" aria-label="Invoice Template">
+                                <button type="button" class="template-tab active" data-template="template-modern">Modern</button>
+                                <button type="button" class="template-tab" data-template="template-classic">Classic</button>
+                                <button type="button" class="template-tab" data-template="template-creative">Creative</button>
+                            </div>
+                            <select id="template-selector" class="form-control" style="display:none;">
+                                <option value="template-modern">Modern Minimalist</option>
+                                <option value="template-classic">Classic Corporate</option>
+                                <option value="template-creative">Creative Studio</option>
+                            </select>
                         </div>
-                        <select id="template-selector" class="form-control" style="display:none;">
-                            <option value="template-modern">Modern Minimalist</option>
-                            <option value="template-classic">Classic Corporate</option>
-                            <option value="template-creative">Creative Studio</option>
-                        </select>
+                        <div class="form-group">
+                            <label>Invoice Status</label>
+                            <select id="invoice-status" class="form-control">
+                                <option value="Draft">Draft</option>
+                                <option value="Sent">Sent</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Overdue">Overdue</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Invoice Status</label>
-                        <select id="invoice-status" class="form-control">
-                            <option value="Draft">Draft</option>
-                            <option value="Sent">Sent</option>
-                            <option value="Paid">Paid</option>
-                            <option value="Overdue">Overdue</option>
-                        </select>
+                        <label>Business Name</label>
+                        <input type="text" id="bus-name" value="Northstar Studio">
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Business Name</label>
-                    <input type="text" id="bus-name" value="Northstar Studio">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Business Logo</label>
-                        <input type="file" id="logo-input" accept="image/*">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Business Logo</label>
+                            <input type="file" id="logo-input" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label>Stamp / Signature</label>
+                            <input type="file" id="stamp-input" accept="image/*">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Stamp / Signature</label>
-                        <input type="file" id="stamp-input" accept="image/*">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Owner / Sender</label>
+                            <input type="text" id="bus-owner" value="Alex Morgan">
+                        </div>
+                        <div class="form-group">
+                            <label>Invoice Number</label>
+                            <input type="text" id="inv-number" value="INV-2026-001">
+                        </div>
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Owner / Sender</label>
-                        <input type="text" id="bus-owner" value="Alex Morgan">
-                    </div>
-                    <div class="form-group">
-                        <label>Invoice Number</label>
-                        <input type="text" id="inv-number" value="INV-2026-001">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="bus-email" value="hello@northstar.studio">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="bus-email" value="hello@northstar.studio">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="text" id="bus-phone" value="+256 700 000000">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Phone</label>
-                        <input type="text" id="bus-phone" value="+256 700 000000">
+                        <label>Business Address</label>
+                        <textarea id="bus-address">Kakoba, Mbarara, Uganda</textarea>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Business Address</label>
-                    <textarea id="bus-address">Kakoba, Mbarara, Uganda</textarea>
-                </div>
-                <hr class="divider">
-                <h3>Client Details</h3>
-                <div class="form-row">
+                    <hr class="divider">
+                    <h3>Client Details</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Client Name</label>
+                            <input type="text" id="client-name" value="Jamie Rivera">
+                        </div>
+                        <div class="form-group">
+                            <label>Company</label>
+                            <input type="text" id="client-company" value="Aperture Labs">
+                        </div>
+                    </div>
                     <div class="form-group">
-                        <label>Client Name</label>
-                        <input type="text" id="client-name" value="Jamie Rivera">
+                        <label>Client Email</label>
+                        <input type="text" id="client-email" value="jamie@aperturelabs.co">
                     </div>
                     <div class="form-group">
-                        <label>Company</label>
-                        <input type="text" id="client-company" value="Aperture Labs">
+                        <label>Client Phone</label>
+                        <input type="text" id="client-phone" value="+256 700 111111">
                     </div>
+                    <div class="form-group">
+                        <label>Client Address</label>
+                        <textarea id="client-address">Mbarara City, Uganda</textarea>
+                    </div>
+                    <hr class="divider">
+                    <h3>Line Items</h3>
+                    <div id="items-container"></div>
+                    <button type="button" id="add-item-btn" class="btn btn-outline">Add Item</button>
                 </div>
-                <div class="form-group">
-                    <label>Client Email</label>
-                    <input type="text" id="client-email" value="jamie@aperturelabs.co">
-                </div>
-                <div class="form-group">
-                    <label>Client Phone</label>
-                    <input type="text" id="client-phone" value="+256 700 111111">
-                </div>
-                <div class="form-group">
-                    <label>Client Address</label>
-                    <textarea id="client-address">Mbarara City, Uganda</textarea>
-                </div>
-                <hr class="divider">
-                <h3>Line Items</h3>
-                <div id="items-container"></div>
-                <button type="button" id="add-item-btn" class="btn btn-outline">Add Item</button>
             </section>
 
             <section class="preview-panel">
@@ -280,6 +281,8 @@
         </div>
     </div>
 
+    <!-- Bootstrap 5 JS Bundle CDN (Required for Offcanvas toggle functionality) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
