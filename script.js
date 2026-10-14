@@ -20,55 +20,240 @@ document.addEventListener('DOMContentLoaded', () => {
     const forgotSuccess = document.getElementById('forgot-success');
 
     const logoutBtn = document.getElementById('logout-btn');
+    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
     const editorPanel = document.getElementById('editor-panel');
-    const editorBackdrop = document.getElementById('editor-backdrop');
+    const mobileEditorDrawer = document.getElementById('mobile-editor-drawer');
+    const drawerBackdrop = document.getElementById('drawer-backdrop');
     const mobileEditorClose = document.getElementById('mobile-editor-close');
     const mobileEditorToggle = document.getElementById('mobile-editor-toggle');
+    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+    const mobileSubviewOverlay = document.getElementById('mobile-subview-overlay');
+    const mobileSubviewBody = document.getElementById('mobile-subview-body');
+    const mobileSubviewTitle = document.getElementById('mobile-subview-title');
+    const mobileSubviewBack = document.getElementById('mobile-subview-back');
+    const mobileSubviewDone = document.getElementById('mobile-subview-done');
+    const mobileTemplateTabs = document.querySelectorAll('.mobile-template-tab');
+    const mobileInvoiceStatus = document.getElementById('mobile-invoice-status');
+    let invoiceStatusSelect;
+    let templateSelector;
 
-    function toggleMobileEditor(forceState) {
-        if (!editorPanel) return;
+    // Cache form sections
+    const formSections = {
+        business: document.querySelector('[data-mobile-section="business"]'),
+        client: document.querySelector('[data-mobile-section="client"]'),
+        items: document.querySelector('[data-mobile-section="items"]')
+    };
 
-        const shouldOpen = typeof forceState === 'boolean' ? forceState : !editorPanel.classList.contains('mobile-open');
-        editorPanel.classList.toggle('mobile-open', shouldOpen);
-        editorPanel.classList.toggle('is-open', shouldOpen);
-        editorBackdrop?.classList.toggle('is-open', shouldOpen);
-        document.body.classList.toggle('editor-panel-open', shouldOpen);
+    function resetMobileViewportState() {
+        if (mobileEditorDrawer) {
+            mobileEditorDrawer.classList.remove('is-open', 'drawer-open');
+            mobileEditorDrawer.style.left = '-100%';
+            mobileEditorDrawer.setAttribute('aria-hidden', 'true');
+        }
 
-        if (mobileEditorToggle) {
-            mobileEditorToggle.setAttribute('aria-expanded', String(shouldOpen));
+        if (mobileSubviewOverlay) {
+            mobileSubviewOverlay.classList.remove('is-visible');
+            mobileSubviewOverlay.setAttribute('aria-hidden', 'true');
+        }
+
+        if (drawerBackdrop) {
+            drawerBackdrop.classList.remove('is-visible');
+            drawerBackdrop.setAttribute('aria-hidden', 'true');
+        }
+
+        document.body.classList.remove('drawer-open', 'mobile-subview-open');
+
+        // Restore sections back to desktop editor sidebar container
+        const desktopEditorContent = document.querySelector('.editor-content') || document.querySelector('.desktop-editor-sidebar');
+        Object.values(formSections).forEach(section => {
+            if (section && desktopEditorContent && section.parentNode !== desktopEditorContent) {
+                desktopEditorContent.appendChild(section);
+            }
+            if (section) section.style.display = '';
+        });
+    }
+
+    function openDrawer() {
+        if (!mobileEditorDrawer || window.innerWidth > 768) return;
+
+        document.body.classList.remove('mobile-subview-open');
+        mobileEditorDrawer.classList.add('is-open', 'drawer-open');
+        mobileEditorDrawer.style.left = '0';
+        mobileEditorDrawer.setAttribute('aria-hidden', 'false');
+
+        if (mobileSubviewOverlay) {
+            mobileSubviewOverlay.classList.remove('is-visible');
+            mobileSubviewOverlay.setAttribute('aria-hidden', 'true');
+        }
+
+        if (drawerBackdrop) {
+            drawerBackdrop.classList.add('is-visible');
+            drawerBackdrop.setAttribute('aria-hidden', 'false');
+        }
+
+        document.body.classList.add('drawer-open');
+        if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeDrawer() {
+        if (!mobileEditorDrawer || window.innerWidth > 768) return;
+
+        mobileEditorDrawer.classList.remove('is-open', 'drawer-open');
+        mobileEditorDrawer.style.left = '-100%';
+        mobileEditorDrawer.setAttribute('aria-hidden', 'true');
+
+        if (drawerBackdrop) {
+            drawerBackdrop.classList.remove('is-visible');
+            drawerBackdrop.setAttribute('aria-hidden', 'true');
+        }
+
+        document.body.classList.remove('drawer-open');
+        if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleDrawer() {
+        if (!mobileEditorDrawer || window.innerWidth > 768) return;
+        if (mobileEditorDrawer.classList.contains('is-open')) {
+            closeDrawer();
+        } else {
+            openDrawer();
         }
     }
 
     if (mobileEditorToggle) {
-        mobileEditorToggle.addEventListener('click', () => toggleMobileEditor());
+        mobileEditorToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.innerWidth <= 768) toggleDrawer();
+        });
     }
 
     if (mobileEditorClose) {
-        mobileEditorClose.addEventListener('click', () => toggleMobileEditor(false));
+        mobileEditorClose.addEventListener('click', () => {
+            if (window.innerWidth <= 768) closeDrawer();
+        });
     }
 
-    if (editorBackdrop) {
-        editorBackdrop.addEventListener('click', () => toggleMobileEditor(false));
+    if (drawerBackdrop) {
+        drawerBackdrop.addEventListener('click', () => {
+            if (window.innerWidth <= 768) closeDrawer();
+        });
     }
+
+    function syncMobileControls() {
+        if (mobileInvoiceStatus && invoiceStatusSelect) {
+            mobileInvoiceStatus.value = invoiceStatusSelect.value;
+        }
+
+        if (templateSelector && mobileTemplateTabs.length) {
+            const templateValue = templateSelector.value;
+            mobileTemplateTabs.forEach((tab) => {
+                tab.classList.toggle('active', tab.dataset.template === templateValue);
+            });
+        }
+    }
+
+    // Bulletproof Subview Handler: Appends requested section into subview body for active typing
+    function openMobileSubview(sectionName) {
+        if (!mobileSubviewOverlay || !mobileSubviewBody || window.innerWidth > 768) return;
+
+        const section = document.querySelector(`[data-mobile-section="${sectionName}"]`);
+        if (!section) return;
+
+        const overlayTitleMap = {
+            business: 'Business Details',
+            client: 'Client Details',
+            items: 'Line Items'
+        };
+
+        closeDrawer();
+
+        mobileSubviewBody.innerHTML = '';
+        section.style.display = 'block';
+        mobileSubviewBody.appendChild(section);
+
+        if (mobileSubviewTitle) mobileSubviewTitle.textContent = overlayTitleMap[sectionName] || 'Details';
+        mobileSubviewOverlay.classList.add('is-visible');
+        mobileSubviewOverlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('mobile-subview-open');
+    }
+
+    function closeMobileSubview() {
+        if (!mobileSubviewOverlay || !mobileSubviewBody) return;
+
+        const section = mobileSubviewBody.querySelector('.form-section');
+        const desktopEditorContent = document.querySelector('.editor-content') || document.querySelector('.desktop-editor-sidebar');
+
+        if (section && desktopEditorContent && section.parentNode !== desktopEditorContent) {
+            desktopEditorContent.appendChild(section);
+            section.style.display = '';
+        }
+
+        mobileSubviewOverlay.classList.remove('is-visible');
+        mobileSubviewOverlay.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('mobile-subview-open');
+    }
+
+    mobileNavItems.forEach((button) => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const section = button.dataset.section;
+            if (section) openMobileSubview(section);
+        });
+    });
+
+    if (mobileSubviewBack) {
+        mobileSubviewBack.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeMobileSubview();
+        });
+    }
+
+    if (mobileSubviewDone) {
+        mobileSubviewDone.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeMobileSubview();
+        });
+    }
+
+    if (mobileInvoiceStatus && invoiceStatusSelect) {
+        mobileInvoiceStatus.addEventListener('change', (e) => {
+            invoiceStatusSelect.value = e.target.value;
+            invoiceData.meta.status = e.target.value;
+            renderPreview();
+        });
+    }
+
+    mobileTemplateTabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+            const templateName = tab.dataset.template;
+            if (!templateName) return;
+            if (templateSelector) templateSelector.value = templateName;
+            document.querySelectorAll('.template-tab').forEach((desktopTab) => {
+                desktopTab.classList.toggle('active', desktopTab.dataset.template === templateName);
+            });
+            invoiceData.meta.template = templateName;
+            renderPreview();
+            syncMobileControls();
+        });
+    });
 
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && editorPanel && editorPanel.classList.contains('mobile-open')) {
-            toggleMobileEditor(false);
+        if (event.key === 'Escape') {
+            if (mobileSubviewOverlay && mobileSubviewOverlay.classList.contains('is-visible')) {
+                closeMobileSubview();
+                return;
+            }
+            if (mobileEditorDrawer && mobileEditorDrawer.classList.contains('is-open')) {
+                closeDrawer();
+            }
         }
     });
 
     window.addEventListener('resize', () => {
         if (window.innerWidth > 768) {
-            editorPanel?.classList.remove('mobile-open', 'is-open');
-            editorBackdrop?.classList.remove('is-open');
-            document.body.classList.remove('editor-panel-open');
-            if (mobileEditorToggle) mobileEditorToggle.setAttribute('aria-expanded', 'false');
+            resetMobileViewportState();
         }
     });
-
-    // On page load, ensure auth container is shown and workspace hidden
-    if (authContainer) authContainer.style.display = 'flex';
-    if (appWorkspace) appWorkspace.style.display = 'none';
 
     // Helper to switch active auth view and reset alerts
     function switchAuthView(viewName) {
@@ -79,16 +264,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Clear all feedback boxes
         [loginError, registerError, forgotError, forgotSuccess].forEach(el => {
             if (el) {
                 el.style.display = 'none';
                 el.textContent = '';
-                if (el === forgotSuccess) {
-                    el.className = 'auth-success';
-                } else {
-                    el.className = 'auth-error';
-                }
+                el.className = el === forgotSuccess ? 'auth-success' : 'auth-error';
             }
         });
 
@@ -107,7 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const shouldShow = input.type === 'password';
                 input.type = shouldShow ? 'text' : 'password';
                 button.setAttribute('aria-pressed', String(shouldShow));
-                button.setAttribute('aria-label', shouldShow ? 'Hide password' : 'Show password');
 
                 const icon = button.querySelector('i');
                 if (icon) {
@@ -120,36 +299,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setupPasswordToggles();
 
-    // Event Listeners for switching views
     if (showRegister) {
-        showRegister.addEventListener('click', (e) => {
-            e.preventDefault();
-            switchAuthView('register');
-        });
+        showRegister.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('register'); });
     }
-
     if (showForgot) {
-        showForgot.addEventListener('click', (e) => {
-            e.preventDefault();
-            switchAuthView('forgot');
-        });
+        showForgot.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('forgot'); });
     }
-
     if (showLoginFromReg) {
-        showLoginFromReg.addEventListener('click', (e) => {
-            e.preventDefault();
-            switchAuthView('login');
-        });
+        showLoginFromReg.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('login'); });
     }
-
     if (showLoginFromForgot) {
-        showLoginFromForgot.addEventListener('click', (e) => {
-            e.preventDefault();
-            switchAuthView('login');
-        });
+        showLoginFromForgot.addEventListener('click', (e) => { e.preventDefault(); switchAuthView('login'); });
     }
 
-    // Login Form Submission (Delegates validation & error handling completely to login.php)
+    // Login Form Submission
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -157,41 +320,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.getElementById('login-password').value;
 
             loginError.style.display = 'none';
-            loginError.textContent = '';
-            loginError.className = 'auth-error';
-
             try {
                 const response = await fetch('login.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
-
                 const data = await response.json();
-
                 if (data.status === 'success') {
-                    if (authContainer) authContainer.style.display = 'none';
-                    if (appWorkspace) appWorkspace.style.display = 'flex';
+                    window.location.reload();
                 } else {
-                    loginError.className = 'auth-error';
                     loginError.textContent = data.message;
                     loginError.style.display = 'block';
                 }
             } catch (err) {
-                loginError.textContent = 'Unable to connect to the server. Please check your connection.';
+                loginError.textContent = 'Unable to connect to the server.';
                 loginError.style.display = 'block';
             }
         });
     }
 
-    function showAuthMessage(element, message, isError = true) {
-        if (!element) return;
-        element.textContent = message;
-        element.className = isError ? 'auth-error' : 'auth-success';
-        element.style.display = 'block';
-    }
-
-    // Register Form Submission (Delegates validation & error handling completely to register.php)
+    // Register Form Submission
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -200,9 +349,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.getElementById('reg-password').value;
 
             registerError.style.display = 'none';
-            registerError.textContent = '';
-            registerError.className = 'auth-error';
-
             try {
                 const response = await fetch('register.php', {
                     method: 'POST',
@@ -210,17 +356,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ name, email, password })
                 });
                 const data = await response.json();
-                
                 if (data.status === 'success') {
                     switchAuthView('login');
-                    showAuthMessage(loginError, data.message, false);
+                    loginError.textContent = data.message;
+                    loginError.className = 'auth-success';
+                    loginError.style.display = 'block';
                 } else {
-                    registerError.className = 'auth-error';
                     registerError.textContent = data.message;
                     registerError.style.display = 'block';
                 }
             } catch (err) {
-                registerError.textContent = 'Unable to connect to the registration server.';
+                registerError.textContent = 'Unable to connect to registration server.';
                 registerError.style.display = 'block';
             }
         });
@@ -242,33 +388,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const data = await response.json();
                 if (data.status === 'success') {
-                    forgotSuccess.textContent = data.message || 'Password reset link sent to your email.';
+                    forgotSuccess.textContent = data.message || 'Reset link sent.';
                     forgotSuccess.style.display = 'block';
                 } else {
                     forgotError.textContent = data.message;
                     forgotError.style.display = 'block';
                 }
             } catch (err) {
-                forgotSuccess.textContent = 'If an account exists with this email, reset instructions have been sent.';
+                forgotSuccess.textContent = 'Reset instructions sent if email exists.';
                 forgotSuccess.style.display = 'block';
             }
         });
     }
 
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            if (appWorkspace) appWorkspace.style.display = 'none';
-            if (authContainer) authContainer.style.display = 'flex';
-            switchAuthView('login');
+        logoutBtn.addEventListener('click', async () => {
+            if (!confirm('Are you sure you want to logout?')) return;
+            try { await fetch('logout.php'); } catch (e) {}
+            window.location.reload();
+        });
+    }
+
+    if (mobileLogoutBtn) {
+        mobileLogoutBtn.addEventListener('click', async () => {
+            if (!confirm('Are you sure you want to logout?')) return;
+            try { await fetch('logout.php'); } catch (e) {}
+            window.location.reload();
         });
     }
 
     // --- Invoice State Management & Live Preview ---
     function generateInvoiceNumber() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const stamp = String(Date.now()).slice(-6);
-        return `INV-${year}-${stamp}`;
+        return `INV-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
     }
 
     let invoiceData = {
@@ -302,7 +453,6 @@ document.addEventListener('DOMContentLoaded', () => {
         stamp: ''
     };
 
-    // DOM Elements for Editor
     const busNameInput = document.getElementById('bus-name');
     const busOwnerInput = document.getElementById('bus-owner');
     const busEmailInput = document.getElementById('bus-email');
@@ -317,8 +467,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const clientAddressInput = document.getElementById('client-address');
 
     const invNumberInput = document.getElementById('inv-number');
-    const invoiceStatusSelect = document.getElementById('invoice-status');
-    const templateSelector = document.getElementById('template-selector');
+    invoiceStatusSelect = document.getElementById('invoice-status');
+    templateSelector = document.getElementById('template-selector');
     const stampInput = document.getElementById('stamp-input');
 
     const invoicePreview = document.getElementById('invoice-preview');
@@ -511,6 +661,7 @@ document.addEventListener('DOMContentLoaded', () => {
             invoiceStatusSelect.addEventListener('change', (e) => {
                 invoiceData.meta.status = e.target.value;
                 renderPreview();
+                syncMobileControls();
             });
         }
 
@@ -520,6 +671,11 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.template-tab').forEach((tab) => {
                 tab.classList.toggle('active', tab.dataset.template === templateName);
             });
+            if (mobileTemplateTabs.length) {
+                mobileTemplateTabs.forEach((tab) => {
+                    tab.classList.toggle('active', tab.dataset.template === templateName);
+                });
+            }
             renderPreview();
         };
 
@@ -584,10 +740,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        if (addItemBtn) {
-            addItemBtn.addEventListener('click', (e) => {
+        const addItemButton = document.getElementById('add-item-btn') || document.getElementById('addItemBtn');
+
+        if (addItemButton) {
+            addItemButton.addEventListener('click', (e) => {
                 e.preventDefault();
-                invoiceData.invoice.items.push({ description: 'New Service Item', qty: 1, price: 50000 });
+                invoiceData.invoice.items.push({
+                    description: 'New Service Item',
+                    qty: 1,
+                    price: 0
+                });
                 renderLineItemsEditor();
                 renderPreview();
             });

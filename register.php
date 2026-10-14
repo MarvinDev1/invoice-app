@@ -3,6 +3,74 @@ require_once 'db.php';
 header('Content-Type: application/json');
 
 $data = json_decode(file_get_contents('php://input'), true);
+
+// 1. Handle Google OAuth Registration/Signup
+if (isset($data['credential'])) {
+    $id_token = $data['credential'];
+    
+    // Verify Google ID token securely via Google's endpoint
+    $url = 'https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($id_token);
+    $response = @file_get_contents($url);
+    
+    if ($response === FALSE) {
+        echo json_encode(["status" => "error", "message" => "Failed to verify Google token."]);
+        exit;
+    }
+    
+    $payload = json_decode($response, true);
+    
+    if (!isset($payload['email']) || empty($payload['email'])) {
+        echo json_encode(["status" => "error", "message" => "Invalid Google account information."]);
+        exit;
+    }
+    
+    $email = filter_var($payload['email'], FILTER_SANITIZE_EMAIL);
+    $google_id = $payload['sub'] ?? '';
+    $full_name = $payload['name'] ?? 'Google User';
+    
+    try {
+        // Check if account already exists
+        $stmt = $pdo->prepare("SELECT id, email, google_id FROM users WHERE email = :email OR google_id = :google_id");
+        $stmt->execute([':email' => $email, ':google_id' => $google_id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($user) {
+            // Link google_id if missing on existing email account
+            if (empty($user['google_id']) && !empty($google_id)) {
+                $updateStmt = $pdo->prepare("UPDATE users SET google_id = :google_id WHERE id = :id");
+                $updateStmt->execute([':google_id' => $google_id, ':id' => $user['id']]);
+            }
+            $userId = $user['id'];
+        } else {
+            // Register new user via Google with a null password
+            $insertStmt = $pdo->prepare("INSERT INTO users (full_name, email, password_hash, google_id) VALUES (:full_name, :email, NULL, :google_id)");
+            $insertStmt->execute([
+                ':full_name' => $full_name,
+                ':email' => $email,
+                ':google_id' => $google_id
+            ]);
+            $userId = $pdo->lastInsertId();
+        }
+        
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['user_id'] = $userId;
+        $_SESSION['email'] = $email;
+        
+        echo json_encode([
+            "status" => "success",
+            "message" => "Google account registered successfully!"
+        ]);
+        exit;
+        
+    } catch (Exception $e) {
+        echo json_encode(["status" => "error", "message" => "Google registration failed: " . $e->getMessage()]);
+        exit;
+    }
+}
+
+// 2. Standard Email/Password Registration Logic
 $name = trim($data['name'] ?? $data['full_name'] ?? '');
 $email = filter_var($data['email'] ?? '', FILTER_SANITIZE_EMAIL);
 $password = $data['password'] ?? '';
